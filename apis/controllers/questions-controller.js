@@ -110,7 +110,7 @@ exports.get_session_questions = (req, res, next) => {
       const response = {
         count: docs.length,
         questions: docs.map((doc) => {
-          console.log(doc.choices.value1);
+          console.log("Choices Value: ", doc.choices);
           return {
             question: doc.question,
             choices: doc.choices,
@@ -137,68 +137,64 @@ exports.player_submitted_answers = (req, res, next) => {
   let count = 0;
   let total = 0;
   let correct = false;
+  let checker = 0
   let scoring;
-  let allScores = [];
-  let submission = req.body;
-  // console.log("submission", submission.length)
-  submission.forEach((element) => {
-    // console.log("my element", element.question)
-    if (!element.question) {
+  let allScores = []
+  let submission = req.body
+  if (Object.keys(submission).length < 3 || Object.keys(submission).length > 3){
+    return res.status(404).json({
+      message: "Please submit only 3 of your answers",
+    });
+  }
+  submission.forEach(element => {
+    if(!element.question){
       return res.status(404).json({
-        message: "question not found",
+      message: "question not found"
       });
     }
-    Question.findById(element.question).then((question) => {
-      if (element.answer == question.correct_answer) {
-        count = 1;
-        correct = true;
-
-        total += 1;
-      } else {
-        count = 0;
-        correct = false;
-      }
-      scoring = new Score({
-        _id: mongoose.Types.ObjectId(),
-        question: element.question,
-        answer: element.answer,
-        is_correct: correct,
-        score: count,
-      });
-      // console.log("working scores",scoring)
-      allScores.push(scoring);
-
-      scoring.save();
-
-      return res.status(201).json({
+    Question.findById(element.question)
+    .then(question => {
+        if(element.answer == question.correct_answer ){
+          count = 1
+          correct = true;          
+          total += 1        
+        }else{
+          count = 0;
+          correct = false;
+        }
+        scoring = new Score({
+          _id: mongoose.Types.ObjectId(),
+          question: element.question,
+          answer: element.answer,
+          is_correct: correct,
+          score: count
+        });
+        allScores.push(scoring)        
+        return scoring.save();    })
+    .then(
+      async result => {
+      checker = checker + 1
+      if (checker > 2){
+        return await res.status(201).json({
         message: "Scores stored",
-        createdScoreResult: [allScores, { total_score: total }],
+        createdScoreResult: [allScores, {total_score: total}],
         request: {
           type: "GET",
-          url: "http://localhost:3000/questions/",
-        },
+          url: "http://localhost:3000/questions/"
+        }
+      });
+      }
+      
+    })
+    .catch(err => {
+      console.log(err);
+      return res.status(500).json({
+        error: err
       });
     });
-    // .then(result => {
-    //   console.log("submission2", allScores)
-    //   return res.status(201).json({
-    //     message: "Scores stored",
-    //     createdScoreResult: [allScores, {total_score: total}],
-    //     request: {
-    //       type: "GET",
-    //       url: "http://localhost:3000/questions/"
-    //     }
-    //   });
-    // })
-    // .catch(err => {
-    //   console.log(err);
-    //   return res.status(500).json({
-    //     error: err
-    //   });
-    // });
 
-    // TO DO: fix failing build when post request is sent
-    /*
+// TO DO: fix failing build when post request is sent
+/*
 Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
     at new NodeError (node:internal/errors:400:5)
     at ServerResponse.setHeader (node:_http_outgoing:663:11)
@@ -210,5 +206,8 @@ Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the cli
   code: 'ERR_HTTP_HEADERS_SENT'
 }
 */
-  });
+  
+});  
+ 
+ 
 };
