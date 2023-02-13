@@ -1,27 +1,25 @@
 {
-  "name": "futurama-game",
+  "name": "takehome-api-test",
   "version": "1.0.0",
-  "description": "build a web API that can be used to play a Futurama Trivia game.",
+  "description": "In-person coding interviews can be stressful, and can hide some people's full potential. A take-home test gives you the chance showcase your talent by working in your own space, and on your own time.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CynthiaAdhiambo/futurama-game.git"
-  },
-  "author": "coduor",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/CynthiaAdhiambo/futurama-game/issues"
-  },
-  "homepage": "https://github.com/CynthiaAdhiambo/futurama-game#readme",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
     "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
     "mongoose": "^6.9.1",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
